@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -37,6 +37,8 @@
                 slategray: "#708090",
                 lightslategray: "#778899",
                 gray: "#808080",
+                treegreen1: "#CCCC99",
+                treegreen2: "#669966",
             }
             const canvas = document.getElementById("canvas");
             const ctx = canvas.getContext("2d");
@@ -76,6 +78,35 @@
                 ctx.textAlign = "right";
 
                 ctx.fillText(t, canvas.width -10, 10);
+            }
+            class Tree {
+                constructor(t, c) {
+                    this.color = c;
+                    this.height = 40 + Math.random() * 40;
+                    this.width = this.height * 2 / Math.tan(Math.PI * 4 / 10);
+                    this.top = ground.top - this.height;
+                    this.bottom = ground.top;
+                    this.left = canvas.width;
+                    this.right = this.left + this.width;
+                    this.speed = 5 + Math.floor(t/500);
+                }
+                update = (t) => {
+                    this.speed = 5 + Math.floor(t/500);
+                    this.left -= this.speed;
+                    this.right -= this.speed;
+                }
+                draw = (ctx) => {
+                    ctx.globalAlpha = 0.5;
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.moveTo(this.left, this.bottom);
+                    ctx.lineTo(this.left + this.width/2, this.top);
+                    ctx.lineTo(this.right, this.bottom);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.globalAlpha = 1;
+                }
+                
             }
             class Rock {
                 constructor(t) {
@@ -177,11 +208,17 @@
             }
             const player = new Player();
             let rocks = [];
+            let trees = [];
             let time = 0;
-            let interval = 0;
+            let rockInterval = 0;
+            let treeInterval = 0;
             let preJudgement = [false,false];
             const intervalid = setInterval(() => {
                 if (isGaming) {
+                    trees = trees.filter(tree => tree.right > 0);
+                    for (tree of trees) {
+                        tree.update(time);
+                    }
                     rocks = rocks.filter(rock => rock.right > 0);
                     const prePlayer = {
                         ...player
@@ -203,25 +240,39 @@
                     }
                     reset();
                     ground.draw(ctx);
+                    for (tree of trees) {
+                        tree.draw(ctx);
+                    }
                     player.draw(ctx);
                     for (rock of rocks) {
                         rock.draw(ctx);
                     }
                     drawScore(ctx,time);
                     time++;
-
-                    if (interval === 0) {
+                    
+                    if (treeInterval === 0) {
+                        const rand = Math.random() * 100;
+                        if (rand < 5) {
+                            treeInterval = 30;
+                            if (rand < 3) {
+                                trees.push(new Tree(time, colors.treegreen1));
+                            } else {
+                                trees.push(new Tree(time, colors.treegreen2))
+                            }
+                            console.log(trees);
+                        }
+                    } else {
+                        treeInterval--;
+                    }
+                    if (rockInterval === 0) {
                         const rand = Math.random() * 100;
                         if (rand < 3) {
                             rocks.push(new Rock(time));
-                            interval = 50;
-                            console.log(rocks);
+                            rockInterval = 50;
                         }
                     } else {
-                        interval--;
+                        rockInterval--;
                     }
-                } else {
-
                 }
             }, 20);
             addEventListener("click", () => {
