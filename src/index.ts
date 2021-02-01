@@ -1,0 +1,13 @@
+export {default as colors}  from "./colors";
+export {default as Player} from "./class/player";
+export {default as Rock} from "./class/rock";
+export {default as Tree} from "./class/tree";
+export {default as Item} from "./class/item";
+export {default as Ground}  from "./class/ground";
+export {default as resizeCanvas}  from "./function/resizeCanvas";
+export {default as resetCanvas}  from "./function/resetCanvas";
+export {default as judgeHit}  from "./function/judgeHit";
+export {default as drawScore} from "./function/drawScore";
+export {default as run} from "./function/run";
+export {default as showResult} from "./function/showResult";
+export {default as defaultDraw} from "./function/defaultDraw";
